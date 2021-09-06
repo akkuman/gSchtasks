@@ -1,5 +1,11 @@
 package win32
 
+import (
+	"encoding/binary"
+	"syscall"
+	"unsafe"
+)
+
 type VT uint16
 
 const (
@@ -66,3 +72,18 @@ const (
 // }
 
 type VARIANT [24]byte
+
+func NewVariant() VARIANT {
+	var v VARIANT
+	VariantInit(&v)
+	return v
+}
+
+func NewVariantWithStr(s string) VARIANT {
+	var v VARIANT
+	psz, _ := syscall.UTF16PtrFromString(s)
+	sas := SysAllocString(uintptr(unsafe.Pointer(psz)))
+	binary.LittleEndian.PutUint16(v[0:2], uint16(VT_BSTR))
+	binary.LittleEndian.PutUint64(v[8:16], uint64(sas))
+	return v
+}

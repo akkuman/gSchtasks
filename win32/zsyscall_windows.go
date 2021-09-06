@@ -45,6 +45,7 @@ var (
 	procCoInitialize     = modole32.NewProc("CoInitialize")
 	procCoInitializeEx   = modole32.NewProc("CoInitializeEx")
 	procCoUninitialize   = modole32.NewProc("CoUninitialize")
+	procSysAllocString   = modoleaut32.NewProc("SysAllocString")
 	procVariantInit      = modoleaut32.NewProc("VariantInit")
 )
 
@@ -68,6 +69,12 @@ func CoInitializeEx(pvReserved LPVOID, dwCoInit DWORD) (hResult HRESULT) {
 
 func CoUninitialize() {
 	syscall.Syscall(procCoUninitialize.Addr(), 0, 0, 0, 0)
+	return
+}
+
+func SysAllocString(psz uintptr) (ss uintptr) {
+	r0, _, _ := syscall.Syscall(procSysAllocString.Addr(), 1, uintptr(psz), 0, 0)
+	ss = uintptr(r0)
 	return
 }
 
